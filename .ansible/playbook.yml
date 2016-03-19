@@ -1,0 +1,102 @@
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: add php7 repo
+      apt_repository: repo="ppa:ondrej/php"
+  roles:
+
+    - role: geerlingguy.nginx
+      nginx_remove_default_vhost: true
+      nginx_vhosts:
+        - listen: "80 default_server"
+          server_name: "adam.dev"
+          root: "/var/www/adam/web"
+          index: "index.php index.html index.htm"
+          extra_parameters: |
+            location / {
+              # try to serve file directly, fallback to app.php
+              try_files $uri /app.php$is_args$args;
+            }
+            # DEV
+            # This rule should only be placed on your development environment
+            # In production, don't include this and don't deploy app_dev.php or config.php
+            location ~ ^/(app_dev|config)\.php(/|$) {
+              # Turn sendfile off as workaround for bug
+              # see: https://github.com/mitchellh/vagrant/issues/351#issuecomment-1339640
+              sendfile off;
+              fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+              fastcgi_split_path_info ^(.+\.php)(/.*)$;
+              include fastcgi_params;
+              # When you are using symlinks to link the document root to the
+              # current version of your application, you should pass the real
+              # application path instead of the path to the symlink to PHP
+              # FPM.
+              # Otherwise, PHP's OPcache may not properly detect changes to
+              # your PHP files (see https://github.com/zendtech/ZendOptimizerPlus/issues/126
+              # for more information).
+              fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+              fastcgi_param DOCUMENT_ROOT $realpath_root;
+            }
+            # PROD
+            location ~ ^/app\.php(/|$) {
+              # Turn sendfile off as workaround for bug
+              # see: https://github.com/mitchellh/vagrant/issues/351#issuecomment-1339640
+              sendfile off;
+              fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+              fastcgi_split_path_info ^(.+\.php)(/.*)$;
+              include fastcgi_params;
+              # When you are using symlinks to link the document root to the
+              # current version of your application, you should pass the real
+              # application path instead of the path to the symlink to PHP
+              # FPM.
+              # Otherwise, PHP's OPcache may not properly detect changes to
+              # your PHP files (see https://github.com/zendtech/ZendOptimizerPlus/issues/126
+              # for more information).
+              fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+              fastcgi_param DOCUMENT_ROOT $realpath_root;
+              # Prevents URIs that include the front controller. This will 404:
+              # http://domain.tld/app.php/some-path
+              # Remove the internal directive to allow URIs like this
+              internal;
+            }
+
+    - role: geerlingguy.php
+      php_packages:
+        - php7.0-cli
+        - php7.0-fpm
+        - php7.0-gd
+        - php7.0-intl
+        - php7.0-mbstring
+        - php7.0-xsl
+        - php-xdebug
+      php_enable_php_fpm: true
+      php_date_timezone: Europe/Berlin
+      php_post_max_size: "10M"
+      php_upload_max_filesize: "10M"
+      php_fpm_pool_conf_path: "/etc/php/7.0/fpm/pool.d/www.conf"
+      php_fpm_daemon: "php7.0-fpm"
+      php_fpm_listen: "/var/run/php/php7.0-fpm.sock"
+      php_fpm_listen_allowed_clients: "127.0.0.1"
+      php_fpm_pm_max_children: 50
+      php_fpm_pm_start_servers: 5
+      php_fpm_pm_min_spare_servers: 5
+      php_fpm_pm_max_spare_servers: 5
+      php_opcache_enabled_in_ini: true
+      # prevents failing attempt to restart apache
+      php_enable_webserver: false
+
+    - role: geerlingguy.mysql
+      mysql_root_password: vagrant
+      mysql_databases:
+        - name: adamdb
+          encoding: utf8
+          collation: utf8_general_ci
+      mysql_users:
+        - name: adamuser
+          host: "%"
+          password: adampass
+          priv: "adamdb.*:ALL"
+
+    - role: geerlingguy.mailhog
+
+    - role: geerlingguy.composer
