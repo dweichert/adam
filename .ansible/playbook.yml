@@ -36,6 +36,8 @@
               # for more information).
               fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
               fastcgi_param DOCUMENT_ROOT $realpath_root;
+              fastcgi_param ADAM_DEBUG true;
+              fastcgi_param ADAM_ENV 'dev';
             }
             # PROD
             location ~ ^/app\.php(/|$) {
@@ -54,6 +56,8 @@
               # for more information).
               fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
               fastcgi_param DOCUMENT_ROOT $realpath_root;
+              fastcgi_param ADAM_DEBUG false;
+              fastcgi_param ADAM_ENV 'prod';
               # Prevents URIs that include the front controller. This will 404:
               # http://domain.tld/app.php/some-path
               # Remove the internal directive to allow URIs like this
