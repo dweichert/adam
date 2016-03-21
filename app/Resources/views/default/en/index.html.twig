@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/css/bootstrap-slider.min.css" integrity="sha384-3yBaIKZshsZNaBlJbc6UelwQfmZ1PxdRTQznO4wXpkAWWZYp0JgqGL/uSrY3+sMO" crossorigin="anonymous">
+    <style type="text/css">
+        .difficulty-slider {
+            height: 40px;
+            vertical-align: middle;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div ng-app="davidWeichertAdam">
+
+        <form id="start" method="post" action="{{ path('play') }}">
+
+        <h1 ng-if="!name">Welcome!</h1>
+        <h1 ng-if="name">Welcome, {{ '{{ name }}' }}!</h1>
+
+        <p>Hi, I am <em>Adam</em> and I want to help you improve your math skills.</p>
+
+        <p>What's your name? <input name="playerName" type="text" ng-model="name"></p>
+
+        <p><a href="" ng-click="showDetails = ! showDetails">Change settings</a></p>
+
+        <div ng-show="showDetails">
+            <div class="well well-lg">
+                <div><strong>Include exercises with &hellip;</strong></div>
+                <div class="checkbox">
+                    <label>
+                        <input name="addition" type="checkbox" checked="checked">
+                        Addition
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input name="subtraction" type="checkbox" checked="checked">
+                        Subtraction
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input name="multiplication" type="checkbox" checked="checked">
+                        Multiplication
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input name="division" type="checkbox" checked="checked">
+                        Division
+                    </label>
+                </div>
+
+                <div id="difficulty">
+                    <div><strong>Difficulty</strong></div>
+
+                    <div>Addition and Subtraction Range</div>
+                    <div class="difficulty-slider">
+                        <strong>0</strong> <input id="addSubRange" name="addSubRange" type="text" data-slider-scale="linear" data-slider-min="0" data-slider-max="250" data-slider-step="1" data-slider-value="[0,100]"/> <strong>250</strong>
+                    </div>
+                    <div>Multiplication and Division Range</div>
+                    <div class="difficulty-slider">
+                        <strong>0</strong> <input id="mulDivRange" name="mulDivRange" type="text" class="difficulty-slider" data-slider-scale="linear" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[0,12]"/> <strong>100</strong>
+                    </div>
+                </div>
+                <div id="numberExercisesSelect">
+                    <div><strong>Number of Exercises</strong></div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="numberOfExercises" id="numberOfExercises6" value="6">
+                            6
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="numberOfExercises" id="numberOfExercises12" value="12">
+                            12
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="numberOfExercises" id="numberOfExercises30" value="30" checked="checked">
+                            30
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="numberOfExercises" id="numberOfExercises60" value="60">
+                            60
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="numberOfExercises" id="numberOfExercises100" value="100">
+                            100
+                        </label>
+                    </div>
+                </div>
+
+
+                <div id="timeLimitSelect">
+                    <div><strong>Time Limit</strong></div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="timeLimit" id="timeLimit1" value="1">
+                            1 Minute
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="timeLimit" id="timeLimit3" value="3" checked="checked">
+                            3 Minutes
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="timeLimit" id="timeLimit5" value="5">
+                            5 Minutes
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="timeLimit" id="timeLimitNone" value="52560000">
+                            None
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Start playing!</button>
+
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/bootstrap-slider.min.js" integrity="sha384-WUipHgi8vTqd7D/utcghIO8bAPim21+XoJly5psr4aDrvS1QD7+7oWOJU2HAMaVL" crossorigin="anonymous"></script>
+    <script>
+    var app = angular.module('davidWeichertAdam', []);
+    app.controller('davidWeichertAdamCtrl', function($scope) {
+        $scope.name= "John";
+    });
+    $(function() {
+        $("#addSubRange").slider({});
+        $("#mulDivRange").slider({});
+    });
+    </script>
+{% endblock %}

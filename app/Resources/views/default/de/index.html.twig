@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Welcome!</h1>
+
+    <p>This is Adam a browser based game to help you exercise your math skills.
+        Have fun and enjoy!</p>
+
+    <form id="start" method="post" action="{{ path('play') }}">
+        <fieldset>
+            <label>Settings</label>
+            <div><strong>Include exercises with &hellip;</strong></div>
+            <div class="checkbox">
+                <label>
+                    <input name="" type="checkbox" value="addition" checked="checked">
+                    Addition
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input name="" type="checkbox" value="subtraction">
+                    Subtraction
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input name="" type="checkbox" value="multiplication">
+                    Multiplication
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input name="" type="checkbox" value="division">
+                    Division
+                </label>
+            </div>
+
+            <div id="numberExercisesSelect">
+                <div><strong>Number of Exercises</strong></div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="numberOfExercises" id="numberOfExercises6" value="6">
+                        6
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="numberOfExercises" id="numberOfExercises12" value="12">
+                        12
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="numberOfExercises" id="numberOfExercises30" value="30" checked="checked">
+                        30
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="numberOfExercises" id="numberOfExercises60" value="60">
+                        60
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="numberOfExercises" id="numberOfExercises100" value="100">
+                        100
+                    </label>
+                </div>
+            </div>
+
+
+            <div id="timeLimitSelect">
+                <div><strong>Time Limit</strong></div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="timeLimit" id="timeLimit1" value="1">
+                        1 Minute
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="timeLimit" id="timeLimit3" value="3" checked="checked">
+                        3 Minutes
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="timeLimit" id="timeLimit5" value="5">
+                        5 Minutes
+                    </label>
+                </div>
+            </div>
+
+        </fieldset>
+
+        <button type="submit" class="btn btn-success">Start playing!</button>
+    </form>
+
+{% endblock %}
