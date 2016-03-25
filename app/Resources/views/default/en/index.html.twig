@@ -2,7 +2,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/css/bootstrap-slider.min.css" integrity="sha384-3yBaIKZshsZNaBlJbc6UelwQfmZ1PxdRTQznO4wXpkAWWZYp0JgqGL/uSrY3+sMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/local-dep-bootstrap-slider/dist/css/bootstrap-slider.min.css') }}">
     <style type="text/css">
         .difficulty-slider {
             height: 40px;
@@ -138,8 +138,8 @@
 
 {% block scripts %}
     {{ parent() }}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/bootstrap-slider.min.js" integrity="sha384-WUipHgi8vTqd7D/utcghIO8bAPim21+XoJly5psr4aDrvS1QD7+7oWOJU2HAMaVL" crossorigin="anonymous"></script>
-    <script>
+    <script type="text/javascript" src="{{ asset('assets/vendor/local-dep-bootstrap-slider/dist/bootstrap-slider.min.js') }}"/>
+    <script type="text/javascript">
     var app = angular.module('davidWeichertAdam', []);
     app.controller('davidWeichertAdamCtrl', function($scope) {
         $scope.name= "John";

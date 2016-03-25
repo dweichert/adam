@@ -43,6 +43,7 @@
     "bower-asset/Respond": "~1.4",
     "bower-asset/jquery": "~1.12",
     "bower-asset/fontawesome": "~4",
+    "bower-asset/angular": "~1",
     "bower-asset/local-dep-bootstrap-slider": "6.1"
   },
   "require-dev": {

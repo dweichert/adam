@@ -4,9 +4,32 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0a8388587ec997875b60c0406214bb12",
-    "content-hash": "667090151d96f8331a7ea3030be07b87",
+    "hash": "517e3222e24e290e7a7c9bf9f883dbc2",
+    "content-hash": "e56849faeb9144a332e44ecd346460b9",
     "packages": [
+        {
+            "name": "bower-asset/angular",
+            "version": "v1.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/angular/bower-angular.git",
+                "reference": "bec191cd9fe2a09cc76810f41c6c9da9a622fdcb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/angular/bower-angular/zipball/bec191cd9fe2a09cc76810f41c6c9da9a622fdcb",
+                "reference": "bec191cd9fe2a09cc76810f41c6c9da9a622fdcb",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "./angular.js",
+                "bower-asset-ignore": []
+            },
+            "license": [
+                "MIT"
+            ]
+        },
         {
             "name": "bower-asset/bootstrap",
             "version": "v3.3.6",
