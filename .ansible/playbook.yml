@@ -71,6 +71,7 @@
         - php7.0-gd
         - php7.0-intl
         - php7.0-mbstring
+        - php7.0-pdo-mysql
         - php7.0-xsl
         - php-xdebug
       php_enable_php_fpm: true
