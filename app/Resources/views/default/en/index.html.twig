@@ -56,11 +56,11 @@
                 <div id="difficulty">
                     <div><strong>Difficulty</strong></div>
 
-                    <div>Addition and Subtraction Range</div>
+                    <label for="addSubRange">Addition and Subtraction Range</label>
                     <div class="difficulty-slider">
                         <strong>0</strong> <input id="addSubRange" name="addSubRange" type="text" data-slider-scale="linear" data-slider-min="0" data-slider-max="250" data-slider-step="1" data-slider-value="[0,100]"/> <strong>250</strong>
                     </div>
-                    <div>Multiplication and Division Range</div>
+                    <label for="mulDivRange">Multiplication and Division Range</label>
                     <div class="difficulty-slider">
                         <strong>0</strong> <input id="mulDivRange" name="mulDivRange" type="text" class="difficulty-slider" data-slider-scale="linear" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[0,12]"/> <strong>100</strong>
                     </div>
@@ -133,6 +133,7 @@
         <button type="submit" class="btn btn-success">Start playing!</button>
 
         </form>
+
     </div>
 {% endblock %}
 
@@ -141,9 +142,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/bootstrap-slider.min.js" integrity="sha384-WUipHgi8vTqd7D/utcghIO8bAPim21+XoJly5psr4aDrvS1QD7+7oWOJU2HAMaVL" crossorigin="anonymous"></script>
     <script type="text/javascript">
     var app = angular.module('davidWeichertAdam', []);
-    app.controller('davidWeichertAdamCtrl', function($scope) {
-        $scope.name= "John";
-    });
     $(function() {
         $("#addSubRange").slider({});
         $("#mulDivRange").slider({});
