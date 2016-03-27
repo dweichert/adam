@@ -33,27 +33,45 @@ class DefaultController extends Controller
         $addSubRange = $this->getRange($request->get('addSubRange'), 0, 250, [0, 100]);
         $mulDivRange = $this->getRange($request->get('mulDivRange'), 0, 100, [0, 12]);
         $exercises = $this->getExercises($request->get('numberOfExercises'), 30);
+        $name = strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : 'Player';
 
-        $game = new Game();
-        $game
-            ->setPlayerName(strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : 'Anonymous')
-            ->setAddition((bool) $request->get('addition'))
-            ->setSubtraction((bool) $request->get('subtraction'))
-            ->setMultiplication((bool) $request->get('multiplication'))
-            ->setDivision((bool) $request->get('division'))
-            ->setAddSubFrom($addSubRange[0])
-            ->setAddSubTo($addSubRange[1])
-            ->setMulDivFrom($mulDivRange[0])
-            ->setMulDivTo($mulDivRange[1])
-            ->setExercises($exercises)
-            ->setTimeLimit($timeLimit)
-            ->setStart(new \DateTime());
+//        $game = new Game();
+//        $game
+//            ->setPlayerName($name)
+//            ->setAddition((bool) $request->get('addition'))
+//            ->setSubtraction((bool) $request->get('subtraction'))
+//            ->setMultiplication((bool) $request->get('multiplication'))
+//            ->setDivision((bool) $request->get('division'))
+//            ->setAddSubFrom($addSubRange[0])
+//            ->setAddSubTo($addSubRange[1])
+//            ->setMulDivFrom($mulDivRange[0])
+//            ->setMulDivTo($mulDivRange[1])
+//            ->setExercises($exercises)
+//            ->setTimeLimit($timeLimit)
+//            ->setStart(new \DateTime());
+//
+//        $em = $this->getDoctrine()->getManager();
+//        $em->persist($game);
+//        $em->flush();
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($game);
-        $em->flush();
+        return $this->render(
+            $view,
+            [
+                'name' => $name,
+                'timeLimit' => $timeLimit <= 5 ? true : false,
+                'minutes' => $timeLimit,
+                'seconds' => 0,
+                'showTimeLimit' => (bool)$request->get('showTimeLimit')
+            ]
+        );
+    }
 
-        return $this->render($view);
+    /**
+     * @Route("/{_locale}/score", requirements={"_locale" = "en|de"}, name="score")
+     */
+    public function scoreAction(Request $request)
+    {
+        var_dump(1);die;
     }
 
     /**

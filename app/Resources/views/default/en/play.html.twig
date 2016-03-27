@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div ng-app="davidWeichertAdamPlay">
+
+        <form id="play" method="post" action="{{ path('score') }}" ng-controller="playCtrl">
+
+        <h1>Let's go, {{ name }}!</h1>
+
+        {% if timeLimit and showTimeLimit %}
+        <p>Remaining time <span class="badge">{{ '{{ remainingTime }}' }}</span></p>
+        {% endif %}
+
+        </form>
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+    var app = angular.module('davidWeichertAdamPlay', []);
+    app.controller('playCtrl', ['$scope', '$interval',
+        function($scope, $interval) {
+            $scope.minutes = {{ minutes }};
+            $scope.seconds = {{ seconds }};
+            $scope.remainingTime = $scope.minutes + ":00";
+            $interval(function () {
+                $scope.getRemainingTime = function () {
+                    if ($scope.minutes == 0 && $scope.seconds == 0) {
+                        return "Time is up!"
+                    } else {
+                        displaySeconds = $scope.seconds;
+                        if ($scope.seconds < 10) {
+                            displaySeconds = "0" + $scope.seconds;
+                        }
+                        return $scope.minutes + ":" + displaySeconds;
+                    }
+                };
+                $scope.remainingTime = $scope.getRemainingTime();
+                if ($scope.seconds == 0) {
+                    $scope.seconds = 59;
+                    $scope.minutes--;
+                } else {
+                    $scope.seconds--;
+                }
+            }, 1000);
+        }
+    ]);
+    </script>
+{% endblock %}
+
