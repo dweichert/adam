@@ -30,26 +30,30 @@
                 <div><strong>Include exercises with &hellip;</strong></div>
                 <div class="checkbox">
                     <label>
-                        <input name="addition" type="checkbox" checked="checked">
-                        Addition
+                        <input ng-model="add" name="addition" type="checkbox" checked="checked" ng-init="add=true">
+                        <span ng-if="add || sub || mul || div">Addition</span>
+                        <span ng-if="!add && !sub && !mul && !div" class="bg-danger" title="Select at least one type of exercise.">Addition</span>
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input name="subtraction" type="checkbox" checked="checked">
-                        Subtraction
+                        <input ng-model="sub" name="subtraction" type="checkbox" checked="checked" ng-init="sub=true">
+                        <span ng-if="add || sub || mul || div">Subtraction</span>
+                        <span ng-if="!add && !sub && !mul && !div" class="bg-danger" title="Select at least one type of exercise.">Subtraction</span>
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input name="multiplication" type="checkbox" checked="checked">
-                        Multiplication
+                        <input ng-model="mul" name="multiplication" type="checkbox" checked="checked" ng-init="mul=true">
+                        <span ng-if="add || sub || mul || div">Multiplication</span>
+                        <span ng-if="!add && !sub && !mul && !div" class="bg-danger" title="Select at least one type of exercise.">Multiplication</span>
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input name="division" type="checkbox" checked="checked">
-                        Division
+                        <input ng-model="div" name="division" type="checkbox" checked="checked" ng-init="div=true">
+                        <span ng-if="add || sub || mul || div">Division</span>
+                        <span ng-if="!add && !sub && !mul && !div" class="bg-danger" title="Select at least one type of exercise.">Division</span>
                     </label>
                 </div>
 
@@ -134,7 +138,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-success">Start playing!</button>
+        <button type="submit" class="btn btn-success" ng-disabled="!add && !sub && !mul && !div">Start playing!</button>
 
         </form>
 
