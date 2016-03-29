@@ -11,6 +11,25 @@
         <p>Remaining time <span class="badge">{{ '{{ remainingTime }}' }}</span></p>
         {% endif %}
 
+        <div class="jumbotron" ng-repeat="exercise in exercises">
+            <div class="lead">
+                {{ '{{ exercise.operand1 }}' }}
+                {{ '{{ exercise.operator }}' }}
+                {{ '{{ exercise.operand2 }}' }}
+                =
+                {{ '{{ exercise.result }}' }}
+            </div>
+            <div>
+                <input type="hidden" name="{{ 'operand1-{{ exercise.number }}' }}" value="{{ '{{ exercise.operand1 }}' }}">
+                <input type="hidden" name="{{ 'operand2-{{ exercise.number }}' }}" value="{{ '{{ exercise.operand2 }}' }}">
+                <input type="hidden" name="{{ 'operator-{{ exercise.number }}' }}" value="{{ '{{ exercise.operator }}' }}">
+                <input type="hidden" name="{{ 'result-{{ exercise.number }}' }}" value="{{ '{{ exercise.result }}' }}">
+                <input type="number" name="{{ 'solution-{{ exercise.number }}' }}">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Finish</button>
+
         </form>
 
     </div>
@@ -22,6 +41,7 @@
     var app = angular.module('davidWeichertAdamPlay', []);
     app.controller('playCtrl', ['$scope', '$interval',
         function($scope, $interval) {
+            $scope.exercises = {{ exercises | json_encode() | raw }};
             $scope.minutes = {{ minutes }};
             $scope.seconds = {{ seconds }};
             $scope.remainingTime = $scope.minutes + ":00";
@@ -38,7 +58,9 @@
                     }
                 };
                 $scope.remainingTime = $scope.getRemainingTime();
-                if ($scope.seconds == 0) {
+                if ($scope.seconds == 0 && $scope.minutes == 0) {
+
+                } else if ($scope.seconds == 0) {
                     $scope.seconds = 59;
                     $scope.minutes--;
                 } else {

@@ -27,32 +27,8 @@ class DefaultController extends Controller
     {
         $locale = $request->getLocale();
         $view = "default/$locale/play.html.twig";
-
-        
         $timeLimit = $this->getTimeLimit($request->get('timeLimit'), 3);
-        $addSubRange = $this->getRange($request->get('addSubRange'), 0, 250, [0, 100]);
-        $mulDivRange = $this->getRange($request->get('mulDivRange'), 0, 100, [0, 12]);
-        $exercises = $this->getExercises($request->get('numberOfExercises'), 30);
         $name = strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : 'Player';
-
-//        $game = new Game();
-//        $game
-//            ->setPlayerName($name)
-//            ->setAddition((bool) $request->get('addition'))
-//            ->setSubtraction((bool) $request->get('subtraction'))
-//            ->setMultiplication((bool) $request->get('multiplication'))
-//            ->setDivision((bool) $request->get('division'))
-//            ->setAddSubFrom($addSubRange[0])
-//            ->setAddSubTo($addSubRange[1])
-//            ->setMulDivFrom($mulDivRange[0])
-//            ->setMulDivTo($mulDivRange[1])
-//            ->setExercises($exercises)
-//            ->setTimeLimit($timeLimit)
-//            ->setStart(new \DateTime());
-//
-//        $em = $this->getDoctrine()->getManager();
-//        $em->persist($game);
-//        $em->flush();
 
         return $this->render(
             $view,
@@ -61,7 +37,8 @@ class DefaultController extends Controller
                 'timeLimit' => $timeLimit <= 5 ? true : false,
                 'minutes' => $timeLimit,
                 'seconds' => 0,
-                'showTimeLimit' => (bool)$request->get('showTimeLimit')
+                'showTimeLimit' => (bool)$request->get('showTimeLimit'),
+                'exercises' => $this->getExercises($request)
             ]
         );
     }
@@ -71,7 +48,25 @@ class DefaultController extends Controller
      */
     public function scoreAction(Request $request)
     {
-        var_dump(1);die;
+        var_dump($request->request->all());die;
+        //        $game = new Game();
+        //        $game
+        //            ->setPlayerName($name)
+        //            ->setAddition((bool) $request->get('addition'))
+        //            ->setSubtraction((bool) $request->get('subtraction'))
+        //            ->setMultiplication((bool) $request->get('multiplication'))
+        //            ->setDivision((bool) $request->get('division'))
+        //            ->setAddSubFrom($addSubRange[0])
+        //            ->setAddSubTo($addSubRange[1])
+        //            ->setMulDivFrom($mulDivRange[0])
+        //            ->setMulDivTo($mulDivRange[1])
+        //            ->setExercises($exercises)
+        //            ->setTimeLimit($timeLimit)
+        //            ->setStart(new \DateTime());
+        //
+        //        $em = $this->getDoctrine()->getManager();
+        //        $em->persist($game);
+        //        $em->flush();
     }
 
     /**
@@ -160,7 +155,7 @@ class DefaultController extends Controller
      * @param int $default
      * @return int
      */
-    public function getExercises($param, $default)
+    private function getNumberOfExercises($param, $default)
     {
         if (!is_numeric($param))
         {
@@ -184,5 +179,140 @@ class DefaultController extends Controller
         }
 
         return 100;
+    }
+
+    /**
+     * @param Request $request
+     * @return string
+     */
+    private function getExercises(Request $request)
+    {
+        $exercises = [];
+        $typeOfExercises = [];
+        $addSubRange = $this->getRange($request->get('addSubRange'), 0, 250, [0, 100]);
+        $mulDivRange = $this->getRange($request->get('mulDivRange'), 0, 100, [0, 12]);
+        $numberOfExercises = $this->getNumberOfExercises($request->get('numberOfExercises'), 30);
+        if ($request->get('addition'))
+        {
+            $typeOfExercises[] = 'addition';
+        }
+        if ($request->get('subtraction'))
+        {
+            $typeOfExercises[] = 'subtraction';
+        }
+        if ($request->get('multiplication'))
+        {
+            $typeOfExercises[] = 'multiplication';
+        }
+        if ($request->get('division'))
+        {
+            $typeOfExercises[] = 'division';
+        }
+        if (empty($typeOfExercises))
+        {
+            $typeOfExercises = ['addition', 'subtraction', 'multiplication', 'division'];
+        }
+        for ($i = 1; $i <= $numberOfExercises; $i++)
+        {
+            $maxIndex = count($typeOfExercises) - 1;
+            $type = $typeOfExercises[rand(0, $maxIndex)];
+            if (in_array($type, ['addtion', 'subtraction']))
+            {
+                $range = $addSubRange;
+            }
+            else
+            {
+                $range = $mulDivRange;
+            }
+            $method = 'get' . ucfirst($type);
+            list($operand1, $operand2, $operator, $result) = $this->$method($range);
+            $hidden = rand(0,2);
+            switch ($hidden)
+            {
+                case 0:
+                    $operand1 = '?';
+                    break;
+                case 1:
+                    $operand2 = '?';
+                    break;
+                default:
+                    $result = '?';
+                    break;
+            }
+            $exercises[] = [
+                'number' => $i,
+                'operand1' => $operand1,
+                'operand2' => $operand2,
+                'operator' => $operator,
+                'result' => $result
+            ];
+        }
+
+        return $exercises;
+    }
+
+    /**
+     * @param int[] $range
+     * @return mixed[]
+     */
+    private function getAddition($range)
+    {
+        $operand1 = rand($range[0], $range[1]);
+        $operand2 = rand($range[0], $range[1]);
+        $operator = '+';
+        $result = $operand1 + $operand2;
+
+        return [$operand1, $operand2, $operator, $result];
+    }
+
+    /**
+     * @param int[] $range
+     * @return mixed[]
+     */
+    private function getSubtraction($range)
+    {
+        $value1 = rand($range[0], $range[1]);
+        $value2 = rand($range[0], $range[1]);
+
+        $operand1 = $value1 >= $value2 ? $value1 : $value2;
+        $operand2 = $value1 <= $value2 ? $value1 : $value2;
+        $operator = '-';
+        $result = $operand1 - $operand2;
+
+        return [$operand1, $operand2, $operator, $result];
+    }
+
+    /**
+     * @param int[] $range
+     * @return mixed[]
+     */
+    private function getMultiplication($range)
+    {
+        $operand1 = rand($range[0], $range[1]);
+        $operand2 = rand($range[0], $range[1]);
+        $operator = 'x';
+        $result = $operand1 * $operand2;
+
+        return [$operand1, $operand2, $operator, $result];
+    }
+
+    /**
+     * @param int[] $range
+     * @return mixed[]
+     */
+    private function getDivision($range)
+    {
+        $value1 = rand($range[0], $range[1]);
+        $value2 = rand($range[0], $range[1]);
+        if ($value2 == 0)
+        {
+            $value2 = 1;
+        }
+        $operand1 = $value1 * $value2;
+        $operand2 = $value2;
+        $operator = ':';
+        $result = $value1;
+
+        return [$operand1, $operand2, $operator, $result];
     }
 }
