@@ -28,7 +28,7 @@ class DefaultController extends Controller
         $locale = $request->getLocale();
         $view = "default/$locale/play.html.twig";
         $timeLimit = $this->getTimeLimit($request->get('timeLimit'), 3);
-        $name = strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : 'Player';
+        $name = strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : '';
 
         return $this->render(
             $view,

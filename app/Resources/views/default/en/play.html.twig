@@ -5,7 +5,8 @@
 
         <form id="play" method="post" action="{{ path('score') }}" ng-controller="playCtrl">
 
-        <h1>Let's go, {{ name }}!</h1>
+        <h1 ng-if="!name">Let's go!</h1>
+        <h1 ng-if="name">Let's go, {{ name }}!</h1>
 
         {% if timeLimit and showTimeLimit %}
         <p>Remaining time <span class="badge">{{ '{{ remainingTime }}' }}</span></p>
@@ -41,6 +42,7 @@
     var app = angular.module('davidWeichertAdamPlay', []);
     app.controller('playCtrl', ['$scope', '$interval',
         function($scope, $interval) {
+            $scope.name = "{{ name }}";
             $scope.exercises = {{ exercises | json_encode() | raw }};
             $scope.minutes = {{ minutes }};
             $scope.seconds = {{ seconds }};
