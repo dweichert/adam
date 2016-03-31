@@ -29,7 +29,7 @@ class DefaultController extends Controller
         $view = "default/$locale/play.html.twig";
         $timeLimit = $this->getTimeLimit($request->get('timeLimit'), 3);
         $name = strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : '';
-        $time = time();
+        $time = json_encode(['start' => time(), 'limit' => $timeLimit]);
 
         return $this->render(
             $view,
@@ -40,8 +40,8 @@ class DefaultController extends Controller
                 'seconds' => 0,
                 'showTimeLimit' => (bool)$request->get('showTimeLimit'),
                 'exercises' => $this->getExercises($request),
-                'start' => $time,
-                'token' => sha1($time . $this->container->getParameter('secret'))
+                'time' => $time,
+                'token' => sha1($time . $this->getParameter('secret'))
             ]
         );
     }
@@ -51,7 +51,15 @@ class DefaultController extends Controller
      */
     public function scoreAction(Request $request)
     {
-        var_dump($request->request->all());die;
+        $locale = $request->getLocale();
+        $view = "default/$locale/score.html.twig";
+        $hash = sha1($request->get('time') . $this->getParameter('secret'));
+        $timeIntegrity = $hash == $request->get('token');
+        $time = json_decode($request->get('time'));
+        $timeExpired = time() > $time->start + $time->limit * 60;
+
+        // var_dump($request->request->all());
+
         //        $game = new Game();
         //        $game
         //            ->setPlayerName($name)
@@ -70,6 +78,14 @@ class DefaultController extends Controller
         //        $em = $this->getDoctrine()->getManager();
         //        $em->persist($game);
         //        $em->flush();
+
+        return $this->render(
+            $view,
+            [
+                'timeIntegrity' => $timeIntegrity,
+                'timeExpired' => $timeExpired
+            ]
+        );
     }
 
     /**
@@ -186,7 +202,7 @@ class DefaultController extends Controller
 
     /**
      * @param Request $request
-     * @return string
+     * @return mixed[]
      */
     private function getExercises(Request $request)
     {
