@@ -8,6 +8,9 @@
         <h1 ng-if="!name">Let's go!</h1>
         <h1 ng-if="name">Let's go, {{ name }}!</h1>
 
+        <input type="hidden" name="start" value="{{ start }}">
+        <input type="hidden" name="token" value="{{ token }}">
+
         {% if timeLimit and showTimeLimit %}
         <p>Remaining time <span class="badge">{{ '{{ remainingTime }}' }}</span></p>
         {% endif %}

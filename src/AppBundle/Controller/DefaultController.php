@@ -29,6 +29,7 @@ class DefaultController extends Controller
         $view = "default/$locale/play.html.twig";
         $timeLimit = $this->getTimeLimit($request->get('timeLimit'), 3);
         $name = strlen($request->get('playerName')) ? substr($request->get('playerName'), 0, 255) : '';
+        $time = time();
 
         return $this->render(
             $view,
@@ -38,7 +39,9 @@ class DefaultController extends Controller
                 'minutes' => $timeLimit,
                 'seconds' => 0,
                 'showTimeLimit' => (bool)$request->get('showTimeLimit'),
-                'exercises' => $this->getExercises($request)
+                'exercises' => $this->getExercises($request),
+                'start' => $time,
+                'token' => sha1($time . $this->container->getParameter('secret'))
             ]
         );
     }
