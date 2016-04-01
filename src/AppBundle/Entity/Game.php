@@ -94,6 +94,21 @@ class Game
     /**
      * @var int
      *
+     * @ORM\Column(name="elapsed", type="integer")
+     */
+    private $elapsed;
+
+    /**
+     * @var bool
+     *
+     *
+     * @ORM\Column(name="multiplication", type="boolean")
+     */
+    private $timeLimitExceeded;
+
+    /**
+     * @var int
+     *
      * @ORM\Column(name="exercises", type="integer")
      */
     private $exercises;
@@ -375,6 +390,54 @@ class Game
     public function getTimeLimit()
     {
         return $this->timeLimit;
+    }
+
+    /**
+     * Get elapsed
+     *
+     * @return int
+     */
+    public function getElapsed()
+    {
+        return $this->elapsed;
+    }
+
+    /**
+     * Set elapsed
+     *
+     * @param $elapsed
+     *
+     * @return Game
+     */
+    public function setElapsed($elapsed)
+    {
+        $this->elapsed = $elapsed;
+
+        return $this;
+    }
+
+    /**
+     * Is time limit exceeded
+     *
+     * @return bool
+     */
+    public function isTimeLimitExceeded()
+    {
+        return $this->timeLimitExceeded;
+    }
+
+    /**
+     * Set time limit exceeded
+     *
+     * @param $timeLimitExceeded
+     *
+     * @return Game
+     */
+    public function setTimeLimitExceeded($timeLimitExceeded)
+    {
+        $this->timeLimitExceeded = $timeLimitExceeded;
+
+        return $this;
     }
 
     /**
