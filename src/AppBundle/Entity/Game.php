@@ -102,7 +102,7 @@ class Game
      * @var bool
      *
      *
-     * @ORM\Column(name="multiplication", type="boolean")
+     * @ORM\Column(name="timeLimitExceeded", type="boolean")
      */
     private $timeLimitExceeded;
 
