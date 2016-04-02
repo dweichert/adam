@@ -58,26 +58,12 @@ class DefaultController extends Controller
         $time = json_decode($request->get('time'));
         $timeExpired = time() > $time->start + $time->limit * 60;
 
-        // var_dump($request->request->all());
+        var_dump($request->request->all());
 
-        //        $game = new Game();
-        //        $game
-        //            ->setPlayerName($name)
-        //            ->setAddition((bool) $request->get('addition'))
-        //            ->setSubtraction((bool) $request->get('subtraction'))
-        //            ->setMultiplication((bool) $request->get('multiplication'))
-        //            ->setDivision((bool) $request->get('division'))
-        //            ->setAddSubFrom($addSubRange[0])
-        //            ->setAddSubTo($addSubRange[1])
-        //            ->setMulDivFrom($mulDivRange[0])
-        //            ->setMulDivTo($mulDivRange[1])
-        //            ->setExercises($exercises)
-        //            ->setTimeLimit($timeLimit)
-        //            ->setStart(new \DateTime());
-        //
-        //        $em = $this->getDoctrine()->getManager();
-        //        $em->persist($game);
-        //        $em->flush();
+        if ($timeIntegrity)
+        {
+            $this->saveGameData();
+        }
 
         return $this->render(
             $view,
@@ -333,5 +319,27 @@ class DefaultController extends Controller
         $result = $value1;
 
         return [$operand1, $operand2, $operator, $result];
+    }
+
+    private function saveGameData()
+    {
+        //        $game = new Game();
+        //        $game
+        //            ->setPlayerName($name)
+        //            ->setAddition((bool) $request->get('addition'))
+        //            ->setSubtraction((bool) $request->get('subtraction'))
+        //            ->setMultiplication((bool) $request->get('multiplication'))
+        //            ->setDivision((bool) $request->get('division'))
+        //            ->setAddSubFrom($addSubRange[0])
+        //            ->setAddSubTo($addSubRange[1])
+        //            ->setMulDivFrom($mulDivRange[0])
+        //            ->setMulDivTo($mulDivRange[1])
+        //            ->setExercises($exercises)
+        //            ->setTimeLimit($timeLimit)
+        //            ->setStart(new \DateTime());
+        //
+        //        $em = $this->getDoctrine()->getManager();
+        //        $em->persist($game);
+        //        $em->flush();
     }
 }
