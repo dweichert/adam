@@ -94,7 +94,7 @@ class Game
     /**
      * @var int
      *
-     * @ORM\Column(name="elapsed", type="integer")
+     * @ORM\Column(name="elapsed", type="integer", nullable=true)
      */
     private $elapsed;
 
@@ -102,7 +102,7 @@ class Game
      * @var bool
      *
      *
-     * @ORM\Column(name="timeLimitExceeded", type="boolean")
+     * @ORM\Column(name="timeLimitExceeded", type="boolean", nullable=true)
      */
     private $timeLimitExceeded;
 
