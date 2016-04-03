@@ -60,23 +60,36 @@ class DefaultController extends Controller
     {
         $locale = $request->getLocale();
         $view = "default/$locale/score.html.twig";
-        $hash = sha1($request->get('id') . $this->getParameter('secret'));
+        $gameId = $request->get('id');
+        $hash = sha1($gameId . $this->getParameter('secret'));
         $idIntegrity = $hash == $request->get('token');
-        $time = json_decode($request->get('time'));
-        $timeExpired = time() > $time->start + $time->limit * 60;
-
-        var_dump($request->request->all());
 
         if ($idIntegrity)
         {
-//            $this->saveGameData();
+            $correct = 0;
+            $incorrect = 0;
+            $exercises = [];
+            $i = 1;
+            while ($i) {
+                $operand1 = $request->get('operand1-' . $i);
+                if (is_null($operand1))
+                {
+                    break;
+                }
+                $operand2 = $request->get('operand2-' . $i);
+                $operator = $request->get('operator-' . $i);
+                $result = $request->get('result-' . $i);
+                $exercises[] = $this->checkExercise($operand1, $operand2, $operator, $result, $correct, $incorrect);
+                $i++;
+            }
+
+            var_dump($request->request->all());
         }
 
         return $this->render(
             $view,
             [
                 'idIntegrity' => $idIntegrity,
-                'timeExpired' => $timeExpired
             ]
         );
     }
@@ -323,6 +336,20 @@ class DefaultController extends Controller
         $result = $value1;
 
         return [$operand1, $operand2, $operator, $result];
+    }
+
+    /**
+     * @param int $operand1
+     * @param int $operand2
+     * @param string $operator
+     * @param int $result
+     * @param int &$correct
+     * @param int &$incorrect
+     * @return string
+     */
+    private function checkExercise($operand1, $operand2, $operator, $result, &$correct, &$incorrect)
+    {
+        return '';
     }
 
     /**
