@@ -79,10 +79,14 @@ class DefaultController extends Controller
                 $operand2 = $request->get('operand2-' . $i);
                 $operator = $request->get('operator-' . $i);
                 $result = $request->get('result-' . $i);
-                $exercises[] = $this->checkExercise($operand1, $operand2, $operator, $result, $correct, $incorrect);
+                $proposed = $request->get('solution-' . $i);
+                $exercises[] = $this->checkExercise($operand1, $operand2, $operator, $result, $proposed, $correct, $incorrect);
                 $i++;
             }
 
+            var_dump($exercises);
+            var_dump($correct);
+            var_dump($incorrect);
             var_dump($request->request->all());
         }
 
@@ -343,13 +347,166 @@ class DefaultController extends Controller
      * @param int $operand2
      * @param string $operator
      * @param int $result
+     * @param int $proposed
      * @param int &$correct
      * @param int &$incorrect
      * @return string
      */
-    private function checkExercise($operand1, $operand2, $operator, $result, &$correct, &$incorrect)
+    private function checkExercise($operand1, $operand2, $operator, $result, $proposed, &$correct, &$incorrect)
     {
-        return '';
+        $missing = array_search('?', ['operand1' => $operand1, 'operand2' => $operand2, 'result' => $result]);
+        switch ($missing)
+        {
+            case 'operand1':
+                $expected = $operand1 = $this->calculateOperand1($result, $operator, $operand2);
+                $given = sprintf('%d %s %d = %d', $proposed, $operator, $operand2, $result);
+                break;
+            case 'operand2':
+                $expected = $operand2 = $this->calculateOperand2($result, $operator, $operand1);
+                $given = sprintf('%d %s %d = %d', $operand1, $operator, $proposed, $result);
+                break;
+            case 'result':
+                $expected = $result = $this->calculateResult($operand1, $operator, $operand2);
+                $given = sprintf('%d %s %d = %d', $operand1, $operator, $operand2, $proposed);
+                break;
+            default:
+                $expected = false;
+                $given = '';
+                break;
+        }
+
+        if (false === $expected)
+        {
+            return '<div class="exercise invalid"></div>';
+        }
+
+        $solution = sprintf('%d %s %d = %d', $operand1, $operator, $operand2, $result);
+
+        if ($expected == $proposed)
+        {
+            $evaluates = 'correct';
+            $correct++;
+        }
+        else
+        {
+            $evaluates = 'incorrect';
+            $incorrect++;
+        }
+
+        return '<div class="exercise ' . $evaluates .'">'
+            . '<span class="correct">' . $solution . '</span>'
+            . '<span class="given">' . $given . '</span>'
+            . '</div>';
+    }
+
+    /**
+     * @param int $result
+     * @param string $operator
+     * @param int $operand2
+     * @return bool|int
+     */
+    private function calculateOperand1($result, $operator, $operand2)
+    {
+        if (!$this->isIntegerish($result) && !$this->isIntegerish($operand2))
+        {
+            return false;
+        }
+        switch ($operator)
+        {
+            case '+':
+                return (int) $result - $operand2;
+                break;
+            case '-':
+                return (int) $result + $operand2;
+                break;
+            case 'x':
+                return (int) $result / $operand2;
+                break;
+            case ':':
+                return (int) $result * $operand2;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    /**
+     * @param int $result
+     * @param string $operator
+     * @param int $operand1
+     * @return bool|int
+     */
+    private function calculateOperand2($result, $operator, $operand1)
+    {
+        if (!$this->isIntegerish($result) && !$this->isIntegerish($operand1))
+        {
+            return false;
+        }
+        switch ($operator)
+        {
+            case '+':
+                return (int) $result - $operand1;
+                break;
+            case '-':
+                return (int) $operand1 - $result;
+                break;
+            case 'x':
+                return (int) $result / $operand1;
+                break;
+            case ':':
+                return (int) $operand1 / $result;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    /**
+     * @param int $operand1
+     * @param string $operator
+     * @param int $operand2
+     * @return bool|int
+     */
+    private function calculateResult($operand1, $operator, $operand2)
+    {
+        if (!$this->isIntegerish($operand1) && !$this->isIntegerish($operand2))
+        {
+            return false;
+        }
+        switch ($operator)
+        {
+            case '+':
+                return (int) $operand1 + $operand2;
+                break;
+            case '-':
+                return (int) $operand1 - $operand2;
+                break;
+            case 'x':
+                return (int) $operand1 * $operand2;
+                break;
+            case ':':
+                return (int) $operand1 / $operand2;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function isIntegerish($value)
+    {
+        if (ctype_digit((string)$value))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**
