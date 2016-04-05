@@ -113,7 +113,7 @@ class DefaultController extends Controller
      */
     private function getTimeLimit($param, $default)
     {
-        if (!is_numeric($param))
+        if (!$this->isIntegerish($param))
         {
             return $default;
         }
@@ -147,11 +147,11 @@ class DefaultController extends Controller
         {
             return $default;
         }
-        if (!is_numeric($components[0]))
+        if (!$this->isIntegerish($components[0]))
         {
             return $default;
         }
-        if (!is_numeric($components[1]))
+        if (!$this->isIntegerish($components[1]))
         {
             return $default;
         }
@@ -186,7 +186,7 @@ class DefaultController extends Controller
      */
     private function getNumberOfExercises($param, $default)
     {
-        if (!is_numeric($param))
+        if (!$this->isIntegerish($param))
         {
             return $default;
         }
