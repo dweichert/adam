@@ -58,6 +58,9 @@ class DefaultController extends Controller
      */
     public function scoreAction(Request $request)
     {
+        $correct = 0;
+        $incorrect = 0;
+        $exercises = [];
         $locale = $request->getLocale();
         $view = "default/$locale/score.html.twig";
         $gameId = $request->get('id');
@@ -66,9 +69,6 @@ class DefaultController extends Controller
 
         if ($idIntegrity)
         {
-            $correct = 0;
-            $incorrect = 0;
-            $exercises = [];
             $i = 1;
             while ($i) {
                 $operand1 = $request->get('operand1-' . $i);
@@ -84,15 +84,20 @@ class DefaultController extends Controller
                 $i++;
             }
 
-            var_dump($exercises);
-            var_dump($correct);
-            var_dump($incorrect);
-            var_dump($request->request->all());
+//            var_dump($exercises);
+//            var_dump($correct);
+//            var_dump($incorrect);
+//            var_dump($request->request->all());
         }
 
         return $this->render(
             $view,
             [
+                // @todo insert name on record from DB make sure "Anonymous" is transformed to empty string
+                'name' => '',
+                'exercises' => $exercises,
+                'correct' => $correct,
+                'incorrect' => $incorrect,
                 'idIntegrity' => $idIntegrity,
             ]
         );
@@ -385,17 +390,22 @@ class DefaultController extends Controller
         if ($expected == $proposed)
         {
             $evaluates = 'correct';
+            $bg = 'bg-success';
+            $result = '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>';
             $correct++;
         }
         else
         {
             $evaluates = 'incorrect';
+            $bg = 'bg-danger';
+            $result = '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>';
             $incorrect++;
         }
 
-        return '<div class="exercise ' . $evaluates .'">'
-            . '<span class="correct">' . $solution . '</span>'
-            . '<span class="given">' . $given . '</span>'
+        return '<div class="exercise ' . $evaluates . ' ' . $bg . '">'
+            . $result
+            . ' <span class="correct">' . $solution . '</span>'
+            . ' <span class="given">' . $given . '</span>'
             . '</div>';
     }
 
