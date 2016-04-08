@@ -1,22 +1,34 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if not name %}
-    <h1>Congratulations!</h1>
-    {% endif %}
+    <div ng-app="davidWeichertAdamScore">
+        {% if not name %}
+        <h1>Congratulations!</h1>
+        {% endif %}
 
-    {% if name %}
-    <h1>Congratulations, {{ name }}!</h1>
-    {% endif %}
+        {% if name %}
+        <h1>Congratulations, {{ name }}!</h1>
+        {% endif %}
 
-    <p>You got {{ correct }} out of {{ correct + incorrect }} exercises correct.</p>
+        <p>You got {{ correct }} out of {{ correct + incorrect }} exercises correct.</p>
 
-    {% if incorrect > 0 %}
-        <p>Have a close look at the exercises you did not get right this time. I am sure you will do
-            better next time.</p>
-    {% endif %}
+        {% if incorrect > 0 %}
+            <p>Have a close look at the exercises you did not get right this time. I am sure you will do
+                better next time.</p>
+        {% endif %}
 
-    {% for exercise in exercises %}
-        <p>{{ exercise | raw }}</p>
-    {% endfor %}
+        {% for exercise in exercises %}
+            <p>{{ exercise | raw }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+    var app = angular.module('davidWeichertAdamScore', []);
+    $(function() {
+        $(".exercise.correct").children(".given").addClass("ng-hide");
+    });
+    </script>
 {% endblock %}
