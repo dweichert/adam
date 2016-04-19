@@ -84,17 +84,18 @@ class DefaultController extends Controller
                 $i++;
             }
 
-//            var_dump($exercises);
-//            var_dump($correct);
-//            var_dump($incorrect);
-//            var_dump($request->request->all());
+            $game = $this->updateGame($request->request->get('id'), $correct, $incorrect);
+            $playerName = $game->getPlayerName();
+            if ('Anonymous' == $playerName)
+            {
+                $playerName = '';
+            }
         }
 
         return $this->render(
             $view,
             [
-                // @todo insert name on record from DB make sure "Anonymous" is transformed to empty string
-                'name' => '',
+                'name' =>$playerName,
                 'exercises' => $exercises,
                 'correct' => $correct,
                 'incorrect' => $incorrect,
@@ -556,29 +557,40 @@ class DefaultController extends Controller
         return $game->getId();
     }
 
-    private function updateGame($id)
+    /**
+     * @param int $id
+     * @param int $correct
+     * @param int $incorrect
+     * @return Game
+     */
+    private function updateGame($id, $correct, $incorrect)
     {
-//        $game = new Game();
-//        $game
-//            ->setPlayerName($name)
-//            ->setAddition((bool) $request->get('addition'))
-//            ->setSubtraction((bool) $request->get('subtraction'))
-//            ->setMultiplication((bool) $request->get('multiplication'))
-//            ->setDivision((bool) $request->get('division'))
-//            ->setAddSubFrom($addSubRange[0])
-//            ->setAddSubTo($addSubRange[1])
-//            ->setMulDivFrom($mulDivRange[0])
-//            ->setMulDivTo($mulDivRange[1])
-//            ->setExercises($exercises)
-//            ->setTimeLimit($timeLimit)
-//            ->setTimeLimitExceeded()
-//            ->setStart(new \DateTime())
-//            ->setFinish()
-//            ->setCorrect()
-//            ->setIncorrect();
-//
-//        $em = $this->getDoctrine()->getManager();
-//        $em->persist($game);
-//        $em->flush();
+        $date = new DateTime();
+        $date
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->setTimestamp(time());
+
+        $repository = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Game');
+
+        $game = $repository->find($id);
+        $timeLimit = $game->getTimeLimit();
+
+        $elapsed = (int)round(($date->getTimestamp() - $game->getStart()->getTimestamp()) / 60);
+        $timeLimitExceeded = $timeLimit > $elapsed ? false : true;
+
+        $game
+            ->setElapsed($elapsed)
+            ->setTimeLimitExceeded($timeLimitExceeded)
+            ->setFinish($date)
+            ->setCorrect((int)$correct)
+            ->setIncorrect((int)$incorrect);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($game);
+        $em->flush();
+
+        return $game;
     }
 }
