@@ -532,9 +532,7 @@ class DefaultController extends Controller
     private function saveGame(Request $request, $name, $time, $addSubRange, $mulDivRange, $numberOfExercises)
     {
         $date = new DateTime();
-        $date
-            ->setTimezone(new DateTimeZone('UTC'))
-            ->setTimestamp($time['start']);
+        $date->setTimestamp($time['start']);
         $game = new Game();
         $game
             ->setPlayerName($name ?: 'Anonymous')
@@ -566,22 +564,27 @@ class DefaultController extends Controller
     private function updateGame($id, $correct, $incorrect)
     {
         $date = new DateTime();
-        $date
-            ->setTimezone(new DateTimeZone('UTC'))
-            ->setTimestamp(time());
+        $date->setTimestamp(time());
 
         $repository = $this
             ->getDoctrine()
             ->getRepository('AppBundle:Game');
 
         $game = $repository->find($id);
+
+        if (!is_null($game->getFinish()))
+        {
+            return $game;
+        }
+
         $timeLimit = $game->getTimeLimit();
 
-        $elapsed = (int)round(($date->getTimestamp() - $game->getStart()->getTimestamp()) / 60);
-        $timeLimitExceeded = $timeLimit > $elapsed ? false : true;
+        $elapsedSeconds = $date->getTimestamp() - $game->getStart()->getTimestamp();
+        $elapsedMinutes = (int)round($elapsedSeconds / 60);
+        $timeLimitExceeded = $timeLimit > $elapsedMinutes ? false : true;
 
         $game
-            ->setElapsed($elapsed)
+            ->setElapsed($elapsedSeconds)
             ->setTimeLimitExceeded($timeLimitExceeded)
             ->setFinish($date)
             ->setCorrect((int)$correct)
