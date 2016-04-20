@@ -101,7 +101,6 @@ class Game
     /**
      * @var bool
      *
-     *
      * @ORM\Column(name="timeLimitExceeded", type="boolean", nullable=true)
      */
     private $timeLimitExceeded;
@@ -141,6 +140,12 @@ class Game
      */
     private $finish;
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="showTimeLimit", type="boolean")
+     */
+    private $showTimeLimit;
 
     /**
      * Get id
@@ -558,6 +563,30 @@ class Game
     public function getFinish()
     {
         return $this->finish;
+    }
+
+    /**
+     * Is time limit exceeded
+     *
+     * @return bool
+     */
+    public function isShowTimeLimit()
+    {
+        return $this->showTimeLimit;
+    }
+
+    /**
+     * Set time limit exceeded
+     *
+     * @param $showTimeLimit
+     *
+     * @return Game
+     */
+    public function setShowTimeLimit($showTimeLimit)
+    {
+        $this->showTimeLimit = $showTimeLimit;
+
+        return $this;
     }
 }
 

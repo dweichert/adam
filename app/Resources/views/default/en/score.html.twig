@@ -2,6 +2,19 @@
 
 {% block body %}
     <div ng-app="davidWeichertAdamScore">
+        <form id="start" method="post" action="{{ path('play') }}">
+
+        <input name="playerName" type="hidden" value="{{ playerName }}">
+        <input name="addition" type="hidden" value="{{ addition }}">
+        <input name="subtraction" type="hidden" value="{{ subtraction }}">
+        <input name="multiplication" type="hidden" value="{{ multiplication }}">
+        <input name="division" type="hidden" value="{{ division }}">
+        <input name="addSubRange" type="hidden" value="{{ addSubRange }}">
+        <input name="mulDivRange" type="hidden" value="{{ mulDivRange }}">
+        <input name="numberOfExercises" type="hidden" value="{{ numberOfExercises }}">
+        <input name="timeLimit" type="hidden" value="{{ timeLimit }}">
+        <input name="showTimeLimit" type="hidden" value="{{ showTimeLimit }}">
+
         {% if not name %}
         <h1>Congratulations!</h1>
         {% endif %}
@@ -20,6 +33,11 @@
         {% for exercise in exercises %}
             <p>{{ exercise | raw }}</p>
         {% endfor %}
+
+        <button type="submit" class="btn btn-success">Play again!</button>
+        <p class="small"><a href="{{ path('homepage') }}">Change settings</a></p>
+
+        </form>
     </div>
 {% endblock %}
 

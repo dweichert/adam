@@ -45,7 +45,7 @@ class DefaultController extends Controller
                 'timeLimit' => $timeLimit <= 5 ? true : false,
                 'minutes' => $timeLimit,
                 'seconds' => 0,
-                'showTimeLimit' => (bool)$request->get('showTimeLimit'),
+                'showTimeLimit' => (bool) $request->get('showTimeLimit'),
                 'exercises' => $this->getExercises($request, $addSubRange, $mulDivRange, $numberOfExercises),
                 'id' => $gameId,
                 'token' => sha1($gameId . $this->getParameter('secret'))
@@ -67,39 +67,47 @@ class DefaultController extends Controller
         $hash = sha1($gameId . $this->getParameter('secret'));
         $idIntegrity = $hash == $request->get('token');
 
-        if ($idIntegrity)
+        if (!$idIntegrity)
         {
-            $i = 1;
-            while ($i) {
-                $operand1 = $request->get('operand1-' . $i);
-                if (is_null($operand1))
-                {
-                    break;
-                }
-                $operand2 = $request->get('operand2-' . $i);
-                $operator = $request->get('operator-' . $i);
-                $result = $request->get('result-' . $i);
-                $proposed = $request->get('solution-' . $i);
-                $exercises[] = $this->checkExercise($operand1, $operand2, $operator, $result, $proposed, $correct, $incorrect);
-                $i++;
-            }
-
-            $game = $this->updateGame($request->request->get('id'), $correct, $incorrect);
-            $playerName = $game->getPlayerName();
-            if ('Anonymous' == $playerName)
-            {
-                $playerName = '';
-            }
+            //@todo something more elegant here
+            throw new \Exception('Integrity compromised!');
         }
 
+        $i = 1;
+        while ($i) {
+            $operand1 = $request->get('operand1-' . $i);
+            if (is_null($operand1))
+            {
+                break;
+            }
+            $operand2 = $request->get('operand2-' . $i);
+            $operator = $request->get('operator-' . $i);
+            $result = $request->get('result-' . $i);
+            $proposed = $request->get('solution-' . $i);
+            $exercises[] = $this->checkExercise($operand1, $operand2, $operator, $result, $proposed, $correct, $incorrect);
+            $i++;
+        }
+
+        $game = $this->updateGame($request->request->get('id'), $correct, $incorrect);
+        $playerName = $game->getPlayerName();
+        
         return $this->render(
             $view,
             [
-                'name' =>$playerName,
+                'name' => 'Anonymous' == $playerName ? '' : $playerName,
                 'exercises' => $exercises,
                 'correct' => $correct,
                 'incorrect' => $incorrect,
-                'idIntegrity' => $idIntegrity,
+                'playerName' => $playerName,
+                'addition' => $game->getAddition(),
+                'subtraction' => $game->getSubtraction(),
+                'multiplication' => $game->getMultiplication(),
+                'division' => $game->getDivision(),
+                'addSubRange' => $game->getAddSubFrom() . ',' . $game->getAddSubTo(),
+                'mulDivRange' => $game->getMulDivFrom() . ',' . $game->getMulDivTo(),
+                'numberOfExercises' => $game->getExercises(),
+                'timeLimit' => $game->getTimeLimit(),
+                'showTimeLimit' => $game->isShowTimeLimit()
             ]
         );
     }
@@ -546,7 +554,8 @@ class DefaultController extends Controller
             ->setAddSubTo($addSubRange[1])
             ->setMulDivFrom($mulDivRange[0])
             ->setMulDivTo($mulDivRange[1])
-            ->setExercises($numberOfExercises);
+            ->setExercises($numberOfExercises)
+            ->setShowTimeLimit((bool) $request->get('showTimeLimit'));
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($game);
