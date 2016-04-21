@@ -368,20 +368,24 @@ class DefaultController extends Controller
      */
     private function checkExercise($operand1, $operand2, $operator, $result, $proposed, &$correct, &$incorrect)
     {
+        if (!$this->isIntegerish($proposed))
+        {
+            $proposed = 'NOT A NUMBER';
+        }
         $missing = array_search('?', ['operand1' => $operand1, 'operand2' => $operand2, 'result' => $result]);
         switch ($missing)
         {
             case 'operand1':
                 $expected = $operand1 = $this->calculateOperand1($result, $operator, $operand2, $proposed);
-                $given = sprintf('%d %s %d = %d', $proposed, $operator, $operand2, $result);
+                $given = sprintf('%s %s %d = %d', $proposed, $operator, $operand2, $result);
                 break;
             case 'operand2':
                 $expected = $operand2 = $this->calculateOperand2($result, $operator, $operand1, $proposed);
-                $given = sprintf('%d %s %d = %d', $operand1, $operator, $proposed, $result, $proposed);
+                $given = sprintf('%d %s %s = %d', $operand1, $operator, $proposed, $result);
                 break;
             case 'result':
                 $expected = $result = $this->calculateResult($operand1, $operator, $operand2);
-                $given = sprintf('%d %s %d = %d', $operand1, $operator, $operand2, $proposed);
+                $given = sprintf('%d %s %d = %s', $operand1, $operator, $operand2, $proposed);
                 break;
             default:
                 $expected = false;
@@ -396,7 +400,7 @@ class DefaultController extends Controller
 
         $solution = sprintf('%d %s %d = %d', $operand1, $operator, $operand2, $result);
 
-        if ($expected == $proposed)
+        if ($expected == $proposed && $this->isIntegerish($proposed))
         {
             $evaluates = 'correct';
             $bg = 'bg-success';
