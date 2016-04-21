@@ -372,12 +372,12 @@ class DefaultController extends Controller
         switch ($missing)
         {
             case 'operand1':
-                $expected = $operand1 = $this->calculateOperand1($result, $operator, $operand2);
+                $expected = $operand1 = $this->calculateOperand1($result, $operator, $operand2, $proposed);
                 $given = sprintf('%d %s %d = %d', $proposed, $operator, $operand2, $result);
                 break;
             case 'operand2':
-                $expected = $operand2 = $this->calculateOperand2($result, $operator, $operand1);
-                $given = sprintf('%d %s %d = %d', $operand1, $operator, $proposed, $result);
+                $expected = $operand2 = $this->calculateOperand2($result, $operator, $operand1, $proposed);
+                $given = sprintf('%d %s %d = %d', $operand1, $operator, $proposed, $result, $proposed);
                 break;
             case 'result':
                 $expected = $result = $this->calculateResult($operand1, $operator, $operand2);
@@ -422,9 +422,10 @@ class DefaultController extends Controller
      * @param int $result
      * @param string $operator
      * @param int $operand2
+     * @param int $proposed
      * @return bool|int
      */
-    private function calculateOperand1($result, $operator, $operand2)
+    private function calculateOperand1($result, $operator, $operand2, $proposed)
     {
         if (!$this->isIntegerish($result) && !$this->isIntegerish($operand2))
         {
@@ -439,6 +440,10 @@ class DefaultController extends Controller
                 return (int) $result + $operand2;
                 break;
             case 'x':
+                if ($operand2 == 0)
+                {
+                    return (int) $this->isIntegerish($proposed) ? $proposed : 1;
+                }
                 return (int) $result / $operand2;
                 break;
             case ':':
@@ -454,9 +459,10 @@ class DefaultController extends Controller
      * @param int $result
      * @param string $operator
      * @param int $operand1
+     * @param int $proposed
      * @return bool|int
      */
-    private function calculateOperand2($result, $operator, $operand1)
+    private function calculateOperand2($result, $operator, $operand1, $proposed)
     {
         if (!$this->isIntegerish($result) && !$this->isIntegerish($operand1))
         {
@@ -471,9 +477,17 @@ class DefaultController extends Controller
                 return (int) $operand1 - $result;
                 break;
             case 'x':
+                if ($operand1 == 0)
+                {
+                    return (int) $this->isIntegerish($proposed) ? $proposed : 1;
+                }
                 return (int) $result / $operand1;
                 break;
             case ':':
+                if ($result == 0)
+                {
+                    return (int) $this->isIntegerishAndNotZero($proposed) ? $proposed : 1;
+                }
                 return (int) $operand1 / $result;
                 break;
             default:
@@ -526,6 +540,24 @@ class DefaultController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private function isIntegerishAndNotZero($value)
+    {
+        if (!$this->isIntegerish($value))
+        {
+            return false;
+        }
+        if ($value == 0)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
