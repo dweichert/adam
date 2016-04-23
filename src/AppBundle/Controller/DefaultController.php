@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Game;
+use AppBundle\Type\Exercise;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,11 +81,14 @@ class DefaultController extends Controller
             {
                 break;
             }
-            $operand2 = $request->get('operand2-' . $i);
-            $operator = $request->get('operator-' . $i);
-            $result = $request->get('result-' . $i);
-            $proposed = $request->get('solution-' . $i);
-            $exercises[] = $this->checkExercise($operand1, $operand2, $operator, $result, $proposed, $correct, $incorrect);
+            $exercise = new Exercise();
+            $exercise->setOperand1($operand1);
+            $exercise->setOperand2($request->get('operand2-' . $i));
+            $exercise->setOperator($request->get('operator-' . $i));
+            $exercise->setResult($request->get('result-' . $i));
+            $exercise->setProposed($request->get('solution-' . $i));
+            
+            $exercises[] = $this->get('app.exercise.checker')->checkExercise($exercise, $correct, $incorrect);
             $i++;
         }
 
@@ -127,7 +131,7 @@ class DefaultController extends Controller
      */
     private function getTimeLimit($param, $default)
     {
-        if (!$this->isIntegerish($param))
+        if (!$this->get('app.assertion.type')->isIntegerish($param))
         {
             return $default;
         }
@@ -161,11 +165,11 @@ class DefaultController extends Controller
         {
             return $default;
         }
-        if (!$this->isIntegerish($components[0]))
+        if (!$this->get('app.assertion.type')->isIntegerish($components[0]))
         {
             return $default;
         }
-        if (!$this->isIntegerish($components[1]))
+        if (!$this->get('app.assertion.type')->isIntegerish($components[1]))
         {
             return $default;
         }
@@ -200,7 +204,7 @@ class DefaultController extends Controller
      */
     private function getNumberOfExercises($param, $default)
     {
-        if (!$this->isIntegerish($param))
+        if (!$this->get('app.assertion.type')->isIntegerish($param))
         {
             return $default;
         }
@@ -354,214 +358,6 @@ class DefaultController extends Controller
         $result = $value1;
 
         return [$operand1, $operand2, $operator, $result];
-    }
-
-    /**
-     * @param int $operand1
-     * @param int $operand2
-     * @param string $operator
-     * @param int $result
-     * @param int $proposed
-     * @param int &$correct
-     * @param int &$incorrect
-     * @return string
-     */
-    private function checkExercise($operand1, $operand2, $operator, $result, $proposed, &$correct, &$incorrect)
-    {
-        if (!$this->isIntegerish($proposed))
-        {
-            $proposed = 'NOT A NUMBER';
-        }
-        $missing = array_search('?', ['operand1' => $operand1, 'operand2' => $operand2, 'result' => $result]);
-        switch ($missing)
-        {
-            case 'operand1':
-                $expected = $operand1 = $this->calculateOperand1($result, $operator, $operand2, $proposed);
-                $given = sprintf('%s %s %d = %d', $proposed, $operator, $operand2, $result);
-                break;
-            case 'operand2':
-                $expected = $operand2 = $this->calculateOperand2($result, $operator, $operand1, $proposed);
-                $given = sprintf('%d %s %s = %d', $operand1, $operator, $proposed, $result);
-                break;
-            case 'result':
-                $expected = $result = $this->calculateResult($operand1, $operator, $operand2);
-                $given = sprintf('%d %s %d = %s', $operand1, $operator, $operand2, $proposed);
-                break;
-            default:
-                $expected = false;
-                $given = '';
-                break;
-        }
-
-        if (false === $expected)
-        {
-            return '<div class="exercise invalid"></div>';
-        }
-
-        $solution = sprintf('%d %s %d = %d', $operand1, $operator, $operand2, $result);
-
-        if ($expected == $proposed && $this->isIntegerish($proposed))
-        {
-            $evaluates = 'correct';
-            $bg = 'bg-success';
-            $result = '<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>';
-            $correct++;
-        }
-        else
-        {
-            $evaluates = 'incorrect';
-            $bg = 'bg-danger';
-            $result = '<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>';
-            $incorrect++;
-        }
-
-        return '<div class="exercise ' . $evaluates . ' ' . $bg . '">'
-            . $result
-            . ' <span class="correct">' . $solution . '</span>'
-            . ' <span class="given">' . $given . '</span>'
-            . '</div>';
-    }
-
-    /**
-     * @param int $result
-     * @param string $operator
-     * @param int $operand2
-     * @param int $proposed
-     * @return bool|int
-     */
-    private function calculateOperand1($result, $operator, $operand2, $proposed)
-    {
-        if (!$this->isIntegerish($result) && !$this->isIntegerish($operand2))
-        {
-            return false;
-        }
-        switch ($operator)
-        {
-            case '+':
-                return (int) $result - $operand2;
-                break;
-            case '-':
-                return (int) $result + $operand2;
-                break;
-            case 'x':
-                if ($operand2 == 0)
-                {
-                    return (int) $this->isIntegerish($proposed) ? $proposed : 1;
-                }
-                return (int) $result / $operand2;
-                break;
-            case ':':
-                return (int) $result * $operand2;
-                break;
-            default:
-                return false;
-                break;
-        }
-    }
-
-    /**
-     * @param int $result
-     * @param string $operator
-     * @param int $operand1
-     * @param int $proposed
-     * @return bool|int
-     */
-    private function calculateOperand2($result, $operator, $operand1, $proposed)
-    {
-        if (!$this->isIntegerish($result) && !$this->isIntegerish($operand1))
-        {
-            return false;
-        }
-        switch ($operator)
-        {
-            case '+':
-                return (int) $result - $operand1;
-                break;
-            case '-':
-                return (int) $operand1 - $result;
-                break;
-            case 'x':
-                if ($operand1 == 0)
-                {
-                    return (int) $this->isIntegerish($proposed) ? $proposed : 1;
-                }
-                return (int) $result / $operand1;
-                break;
-            case ':':
-                if ($result == 0)
-                {
-                    return (int) $this->isIntegerishAndNotZero($proposed) ? $proposed : 1;
-                }
-                return (int) $operand1 / $result;
-                break;
-            default:
-                return false;
-                break;
-        }
-    }
-
-    /**
-     * @param int $operand1
-     * @param string $operator
-     * @param int $operand2
-     * @return bool|int
-     */
-    private function calculateResult($operand1, $operator, $operand2)
-    {
-        if (!$this->isIntegerish($operand1) && !$this->isIntegerish($operand2))
-        {
-            return false;
-        }
-        switch ($operator)
-        {
-            case '+':
-                return (int) $operand1 + $operand2;
-                break;
-            case '-':
-                return (int) $operand1 - $operand2;
-                break;
-            case 'x':
-                return (int) $operand1 * $operand2;
-                break;
-            case ':':
-                return (int) $operand1 / $operand2;
-                break;
-            default:
-                return false;
-                break;
-        }
-    }
-
-    /**
-     * @param mixed $value
-     * @return bool
-     */
-    private function isIntegerish($value)
-    {
-        if (ctype_digit((string)$value))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param mixed $value
-     * @return bool
-     */
-    private function isIntegerishAndNotZero($value)
-    {
-        if (!$this->isIntegerish($value))
-        {
-            return false;
-        }
-        if ($value == 0)
-        {
-            return false;
-        }
-
-        return true;
     }
 
     /**
