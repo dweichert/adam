@@ -8,7 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use \DateTime;
-use \DateTimeZone;
 
 class DefaultController extends Controller
 {
@@ -87,7 +86,7 @@ class DefaultController extends Controller
             $exercise->setOperator($request->get('operator-' . $i));
             $exercise->setResult($request->get('result-' . $i));
             $exercise->setProposed($request->get('solution-' . $i));
-            
+
             $exercises[] = $this->get('app.exercise.checker')->checkExercise($exercise, $correct, $incorrect);
             $i++;
         }
